@@ -33,6 +33,12 @@ void get_defaults_cgo(obs_data_t* settings)
 	getDefaults(settings);
 }
 
+void video_render_cgo(void* data, gs_effect_t* effect)
+{
+	void videoRender(void* data, gs_effect_t* effect);
+	videoRender(data, effect);
+}
+
 uint32_t get_width_cgo(void* data)
 {
 	uint32_t getWidth(void* data);

@@ -18,6 +18,9 @@ package main
 // typedef void (*cb_get_defaults)(obs_data_t* settings);
 // void get_defaults_cgo(obs_data_t* settings);
 //
+// typedef void (*cb_video_render)(void* data, gs_effect_t* effect);
+// void video_render_cgo(void* data, gs_effect_t* effect);
+//
 // typedef uint32_t (*cb_get_width)(void* data);
 // uint32_t get_width_cgo(void* data);
 //
@@ -66,6 +69,7 @@ var source = C.struct_obs_source_info{
 
 	get_properties: C.cb_get_properties(unsafe.Pointer(C.get_properties_cgo)),
 	get_defaults:   C.cb_get_defaults(unsafe.Pointer(C.get_defaults_cgo)),
+	video_render:   C.cb_video_render(unsafe.Pointer(C.video_render_cgo)),
 	get_width:      C.cb_get_width(unsafe.Pointer(C.get_width_cgo)),
 	get_height:     C.cb_get_height(unsafe.Pointer(C.get_height_cgo)),
 	update:         C.cb_update(unsafe.Pointer(C.update_cgo)),
@@ -96,6 +100,11 @@ func getProperties(data unsafe.Pointer) *C.obs_properties_t {
 
 //export getDefaults
 func getDefaults(settings *C.obs_data_t) {
+
+}
+
+//export videoRender
+func videoRender(data unsafe.Pointer, effect *C.gs_effect_t) {
 
 }
 
