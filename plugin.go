@@ -11,6 +11,21 @@ package main
 //
 // typedef void (*cb_destroy)(void* data);
 // void destroy_cgo(void* data);
+//
+// typedef obs_properties_t* (*cb_get_properties)(void* data);
+// obs_properties_t* get_properties_cgo(void* data);
+//
+// typedef void (*cb_get_defaults)(obs_data_t* settings);
+// void get_defaults_cgo(obs_data_t* settings);
+//
+// typedef void (*cb_update)(void* data, obs_data_t* settings);
+// void update_cgo(void* data, obs_data_t* settings);
+//
+// typedef void (*cb_show)(void* data);
+// void show_cgo(void* data);
+//
+// typedef void (*cb_hide)(void* data);
+// void hide_cgo(void* data);
 import "C"
 import "unsafe"
 
@@ -42,6 +57,12 @@ var source = C.struct_obs_source_info{
 	get_name: C.cb_get_name(unsafe.Pointer(C.get_name_cgo)),
 	create:   C.cb_create(unsafe.Pointer(C.create_cgo)),
 	destroy:  C.cb_destroy(unsafe.Pointer(C.destroy_cgo)),
+
+	get_properties: C.cb_get_properties(unsafe.Pointer(C.get_properties_cgo)),
+	get_defaults:   C.cb_get_defaults(unsafe.Pointer(C.get_defaults_cgo)),
+	update:         C.cb_update(unsafe.Pointer(C.update_cgo)),
+	show:           C.cb_show(unsafe.Pointer(C.show_cgo)),
+	hide:           C.cb_hide(unsafe.Pointer(C.hide_cgo)),
 }
 
 //export getName
@@ -57,6 +78,32 @@ func create(settings *C.obs_data_t, source *C.obs_source_t) unsafe.Pointer {
 //export destroy
 func destroy(data unsafe.Pointer) {
 	C.free(data)
+}
+
+//export getProperties
+func getProperties(data unsafe.Pointer) *C.obs_properties_t {
+	properties := C.obs_properties_create()
+	return properties
+}
+
+//export getDefaults
+func getDefaults(settings *C.obs_data_t) {
+
+}
+
+//export update
+func update(data unsafe.Pointer, settings *C.obs_data_t) {
+
+}
+
+//export show
+func show(data unsafe.Pointer) {
+
+}
+
+//export hide
+func hide(data unsafe.Pointer) {
+
 }
 
 //export obs_module_load

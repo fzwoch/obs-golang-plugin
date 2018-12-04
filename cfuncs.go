@@ -20,5 +20,35 @@ void destroy_cgo(void* data)
 	void destroy(void* data);
 	destroy(data);
 }
+
+obs_properties_t* get_properties_cgo(void* data)
+{
+	obs_properties_t* getProperties(void* data);
+	return getProperties(data);
+}
+
+void get_defaults_cgo(obs_data_t* settings)
+{
+	void getDefaults(obs_data_t* settings);
+	getDefaults(settings);
+}
+
+void update_cgo(void* data, obs_data_t* settings)
+{
+	void update(void* data, obs_data_t* settings);
+	update(data, settings);
+}
+
+void show_cgo(void* data)
+{
+	void show(void* data);
+	show(data);
+}
+
+void hide_cgo(void* data)
+{
+	void hide(void* data);
+	hide(data);
+}
 */
 import "C"
