@@ -18,6 +18,12 @@ package main
 // typedef void (*cb_get_defaults)(obs_data_t* settings);
 // void get_defaults_cgo(obs_data_t* settings);
 //
+// typedef uint32_t (*cb_get_width)(void* data);
+// uint32_t get_width_cgo(void* data);
+//
+// typedef uint32_t (*cb_get_height)(void* data);
+// uint32_t get_height_cgo(void* data);
+//
 // typedef void (*cb_update)(void* data, obs_data_t* settings);
 // void update_cgo(void* data, obs_data_t* settings);
 //
@@ -60,6 +66,8 @@ var source = C.struct_obs_source_info{
 
 	get_properties: C.cb_get_properties(unsafe.Pointer(C.get_properties_cgo)),
 	get_defaults:   C.cb_get_defaults(unsafe.Pointer(C.get_defaults_cgo)),
+	get_width:      C.cb_get_width(unsafe.Pointer(C.get_width_cgo)),
+	get_height:     C.cb_get_height(unsafe.Pointer(C.get_height_cgo)),
 	update:         C.cb_update(unsafe.Pointer(C.update_cgo)),
 	show:           C.cb_show(unsafe.Pointer(C.show_cgo)),
 	hide:           C.cb_hide(unsafe.Pointer(C.hide_cgo)),
@@ -89,6 +97,16 @@ func getProperties(data unsafe.Pointer) *C.obs_properties_t {
 //export getDefaults
 func getDefaults(settings *C.obs_data_t) {
 
+}
+
+//export getWidth
+func getWidth(data unsafe.Pointer) C.uint32_t {
+	return 0
+}
+
+//export getHeight
+func getHeight(data unsafe.Pointer) C.uint32_t {
+	return 0
 }
 
 //export update

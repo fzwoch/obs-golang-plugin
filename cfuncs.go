@@ -33,6 +33,18 @@ void get_defaults_cgo(obs_data_t* settings)
 	getDefaults(settings);
 }
 
+uint32_t get_width_cgo(void* data)
+{
+	uint32_t getWidth(void* data);
+	return getWidth(data);
+}
+
+uint32_t get_height_cgo(void* data)
+{
+	uint32_t getHeight(void* data);
+	return getHeight(data);
+}
+
 void update_cgo(void* data, obs_data_t* settings)
 {
 	void update(void* data, obs_data_t* settings);
