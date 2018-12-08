@@ -63,9 +63,9 @@ type ctx struct {
 
 var ctxs = struct {
 	sync.Mutex
-	m map[uintptr]*ctx
+	m map[unsafe.Pointer]*ctx
 }{
-	m: make(map[uintptr]*ctx),
+	m: make(map[unsafe.Pointer]*ctx),
 }
 
 var id = C.CString("obs-golang-plugin")
@@ -101,11 +101,9 @@ func create(settings *C.obs_data_t, source *C.obs_source_t) unsafe.Pointer {
 	defer ctxs.Unlock()
 
 	ctx := &ctx{}
-	ptr := uintptr(unsafe.Pointer(ctx))
+	ctxs.m[unsafe.Pointer(ctx)] = ctx
 
-	ctxs.m[ptr] = ctx
-
-	return unsafe.Pointer(ptr)
+	return unsafe.Pointer(ctx)
 }
 
 //export destroy
@@ -113,7 +111,7 @@ func destroy(data unsafe.Pointer) {
 	ctxs.Lock()
 	defer ctxs.Unlock()
 
-	ctxs.m[uintptr(data)] = nil
+	ctxs.m[data] = nil
 }
 
 //export getProperties
