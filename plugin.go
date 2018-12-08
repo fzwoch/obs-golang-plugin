@@ -36,7 +36,10 @@ package main
 // typedef void (*cb_hide)(void* data);
 // void hide_cgo(void* data);
 import "C"
-import "unsafe"
+import (
+	"sync"
+	"unsafe"
+)
 
 var obsModulePointer *C.obs_module_t
 
@@ -53,6 +56,16 @@ func obs_current_module() *C.obs_module_t {
 //export obs_module_ver
 func obs_module_ver() C.uint32_t {
 	return C.LIBOBS_API_VER
+}
+
+type ctx struct {
+}
+
+var ctxs = struct {
+	sync.Mutex
+	m map[uintptr]*ctx
+}{
+	m: make(map[uintptr]*ctx),
 }
 
 var id = C.CString("obs-golang-plugin")
@@ -84,12 +97,23 @@ func getName(typeData unsafe.Pointer) *C.char {
 
 //export create
 func create(settings *C.obs_data_t, source *C.obs_source_t) unsafe.Pointer {
-	return C.malloc(1)
+	ctxs.Lock()
+	defer ctxs.Unlock()
+
+	ctx := &ctx{}
+	ptr := uintptr(unsafe.Pointer(ctx))
+
+	ctxs.m[ptr] = ctx
+
+	return unsafe.Pointer(ptr)
 }
 
 //export destroy
 func destroy(data unsafe.Pointer) {
-	C.free(data)
+	ctxs.Lock()
+	defer ctxs.Unlock()
+
+	ctxs.m[uintptr(data)] = nil
 }
 
 //export getProperties
