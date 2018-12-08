@@ -37,7 +37,6 @@ package main
 // void hide_cgo(void* data);
 import "C"
 import (
-	"sync"
 	"unsafe"
 )
 
@@ -59,13 +58,6 @@ func obs_module_ver() C.uint32_t {
 }
 
 type ctx struct {
-}
-
-var ctxs = struct {
-	sync.Mutex
-	m map[unsafe.Pointer]*ctx
-}{
-	m: make(map[unsafe.Pointer]*ctx),
 }
 
 var id = C.CString("obs-golang-plugin")
@@ -97,21 +89,12 @@ func getName(typeData unsafe.Pointer) *C.char {
 
 //export create
 func create(settings *C.obs_data_t, source *C.obs_source_t) unsafe.Pointer {
-	ctxs.Lock()
-	defer ctxs.Unlock()
-
-	ctx := &ctx{}
-	ctxs.m[unsafe.Pointer(ctx)] = ctx
-
-	return unsafe.Pointer(ctx)
+	return unsafe.Pointer(&ctx{})
 }
 
 //export destroy
 func destroy(data unsafe.Pointer) {
-	ctxs.Lock()
-	defer ctxs.Unlock()
-
-	ctxs.m[data] = nil
+	data = nil
 }
 
 //export getProperties
