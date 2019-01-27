@@ -35,8 +35,22 @@ package main
 //
 // typedef void (*cb_hide)(void* data);
 // void hide_cgo(void* data);
+//
+// typedef struct {
+//   int ctx;
+// } data_t;
 import "C"
-import "unsafe"
+import (
+	"sync"
+	"unsafe"
+)
+
+var ctxs = struct {
+	sync.Mutex
+	c []*int
+}{
+	c: make([]*int, 0),
+}
 
 var obsModulePointer *C.obs_module_t
 
@@ -84,11 +98,38 @@ func getName(typeData unsafe.Pointer) *C.char {
 
 //export create
 func create(settings *C.obs_data_t, source *C.obs_source_t) unsafe.Pointer {
-	return C.malloc(1)
+	var idx = -1
+
+	ctxs.Lock()
+
+	for i := 0; i < len(ctxs.c); i++ {
+		if ctxs.c[i] == nil {
+			idx = i
+			break
+		}
+	}
+
+	if idx == -1 {
+		idx = len(ctxs.c)
+		ctxs.c = append(ctxs.c, nil)
+	}
+
+	ctxs.Unlock()
+
+	data := (*C.data_t)(C.malloc(C.sizeof_data_t))
+	data.ctx = C.int(idx)
+
+	return unsafe.Pointer(data)
 }
 
 //export destroy
 func destroy(data unsafe.Pointer) {
+	c := (*C.data_t)(data)
+
+	ctxs.Lock()
+	ctxs.c[c.ctx] = nil
+	ctxs.Unlock()
+
 	C.free(data)
 }
 
