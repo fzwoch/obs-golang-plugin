@@ -45,11 +45,16 @@ import (
 	"unsafe"
 )
 
+type ctx struct {
+	num int
+	str string
+}
+
 var ctxs = struct {
-	sync.Mutex
-	c []*int
+	sync.RWMutex
+	c []*ctx
 }{
-	c: make([]*int, 0),
+	c: make([]*ctx, 0),
 }
 
 var obsModulePointer *C.obs_module_t
@@ -113,6 +118,15 @@ func create(settings *C.obs_data_t, source *C.obs_source_t) unsafe.Pointer {
 		idx = len(ctxs.c)
 		ctxs.c = append(ctxs.c, nil)
 	}
+
+	ctxs.c[idx] = &ctx{
+		num: idx,
+		str: "",
+	}
+
+	ctx := ctxs.c[idx]
+
+	ctx.str = "a plugin instance"
 
 	ctxs.Unlock()
 
