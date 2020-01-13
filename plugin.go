@@ -102,7 +102,7 @@ func create(settings *C.obs_data_t, source *C.obs_source_t) unsafe.Pointer {
 	ctxs.c[data] = &ctx{}
 	ctxs.Unlock()
 
-	return unsafe.Pointer(data)
+	return data
 }
 
 //export destroy
