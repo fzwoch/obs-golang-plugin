@@ -35,26 +35,19 @@ package main
 //
 // typedef void (*cb_hide)(void* data);
 // void hide_cgo(void* data);
-//
-// typedef struct {
-//   int ctx;
-// } data_t;
 import "C"
 import (
 	"sync"
 	"unsafe"
 )
 
-type ctx struct {
-	num int
-	str string
-}
+type ctx struct {}
 
 var ctxs = struct {
 	sync.RWMutex
-	c []*ctx
+	c map[unsafe.Pointer]*ctx
 }{
-	c: make([]*ctx, 0),
+	c: make(map[unsafe.Pointer]*ctx, 0),
 }
 
 var obsModulePointer *C.obs_module_t
@@ -74,11 +67,8 @@ func obs_module_ver() C.uint32_t {
 	return C.LIBOBS_API_VER
 }
 
-var id = C.CString("obs-golang-plugin")
-var name = C.CString("OBS Golang Plugin")
-
 var source = C.struct_obs_source_info{
-	id:           id,
+	id:           C.CString("obs-golang-plugin"),
 	_type:        C.OBS_SOURCE_TYPE_INPUT,
 	output_flags: C.OBS_SOURCE_ASYNC_VIDEO | C.OBS_SOURCE_AUDIO | C.OBS_SOURCE_DO_NOT_DUPLICATE,
 
@@ -98,50 +88,27 @@ var source = C.struct_obs_source_info{
 
 //export getName
 func getName(typeData unsafe.Pointer) *C.char {
-	return name
+	return C.CString("OBS Golang Plugin")
 }
 
 //export create
 func create(settings *C.obs_data_t, source *C.obs_source_t) unsafe.Pointer {
-	var idx = -1
+	data := C.malloc(0)
+	if data == nil {
+		panic("nope!")
+	}
 
 	ctxs.Lock()
-
-	for i := 0; i < len(ctxs.c); i++ {
-		if ctxs.c[i] == nil {
-			idx = i
-			break
-		}
-	}
-
-	if idx == -1 {
-		idx = len(ctxs.c)
-		ctxs.c = append(ctxs.c, nil)
-	}
-
-	ctxs.c[idx] = &ctx{
-		num: idx,
-		str: "",
-	}
-
-	ctx := ctxs.c[idx]
-
-	ctx.str = "a plugin instance"
-
+	ctxs.c[data] = &ctx{}
 	ctxs.Unlock()
-
-	data := (*C.data_t)(C.malloc(C.sizeof_data_t))
-	data.ctx = C.int(idx)
 
 	return unsafe.Pointer(data)
 }
 
 //export destroy
 func destroy(data unsafe.Pointer) {
-	c := (*C.data_t)(data)
-
 	ctxs.Lock()
-	ctxs.c[c.ctx] = nil
+	delete(ctxs.c, data)
 	ctxs.Unlock()
 
 	C.free(data)
