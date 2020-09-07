@@ -1,6 +1,7 @@
 package main
 
-// #cgo LDFLAGS: -lobs
+// #cgo pkg-config: libobs
+//
 // #include <obs/obs-module.h>
 //
 // typedef const char* (*cb_get_name)(void* type_data);
