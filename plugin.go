@@ -48,7 +48,7 @@ var ctxs = struct {
 	sync.RWMutex
 	c map[unsafe.Pointer]*ctx
 }{
-	c: make(map[unsafe.Pointer]*ctx, 0),
+	c: make(map[unsafe.Pointer]*ctx),
 }
 
 var obsModulePointer *C.obs_module_t
