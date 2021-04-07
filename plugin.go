@@ -4,38 +4,38 @@ package main
 //
 // #include <obs/obs-module.h>
 //
-// typedef const char* (*cb_get_name)(void* type_data);
-// extern const char* get_name_cgo(void* type_data);
+// typedef char* (*cb_get_name)(void* type_data);
+// extern char* getName(void* type_data);
 //
 // typedef void* (*cb_create)(obs_data_t* settings, obs_source_t* source);
-// extern void* create_cgo(obs_data_t* settings, obs_source_t* source);
+// extern void* create(obs_data_t* settings, obs_source_t* source);
 //
 // typedef void (*cb_destroy)(void* data);
-// extern void destroy_cgo(void* data);
+// extern void destroy(void* data);
 //
 // typedef obs_properties_t* (*cb_get_properties)(void* data);
-// extern obs_properties_t* get_properties_cgo(void* data);
+// extern obs_properties_t* getProperties(void* data);
 //
 // typedef void (*cb_get_defaults)(obs_data_t* settings);
-// extern void get_defaults_cgo(obs_data_t* settings);
+// extern void getDefaults(obs_data_t* settings);
 //
 // typedef void (*cb_video_render)(void* data, gs_effect_t* effect);
-// extern void video_render_cgo(void* data, gs_effect_t* effect);
+// extern void videoRender(void* data, gs_effect_t* effect);
 //
 // typedef uint32_t (*cb_get_width)(void* data);
-// extern uint32_t get_width_cgo(void* data);
+// extern uint32_t getWidth(void* data);
 //
 // typedef uint32_t (*cb_get_height)(void* data);
-// extern uint32_t get_height_cgo(void* data);
+// extern uint32_t getHeight(void* data);
 //
 // typedef void (*cb_update)(void* data, obs_data_t* settings);
-// extern void update_cgo(void* data, obs_data_t* settings);
+// extern void update(void* data, obs_data_t* settings);
 //
 // typedef void (*cb_show)(void* data);
-// extern void show_cgo(void* data);
+// extern void show(void* data);
 //
 // typedef void (*cb_hide)(void* data);
-// extern void hide_cgo(void* data);
+// extern void hide(void* data);
 import "C"
 import (
 	"sync"
@@ -73,18 +73,18 @@ var source = C.struct_obs_source_info{
 	_type:        C.OBS_SOURCE_TYPE_INPUT,
 	output_flags: C.OBS_SOURCE_ASYNC_VIDEO | C.OBS_SOURCE_AUDIO | C.OBS_SOURCE_DO_NOT_DUPLICATE,
 
-	get_name: C.cb_get_name(unsafe.Pointer(C.get_name_cgo)),
-	create:   C.cb_create(unsafe.Pointer(C.create_cgo)),
-	destroy:  C.cb_destroy(unsafe.Pointer(C.destroy_cgo)),
+	get_name: C.cb_get_name(unsafe.Pointer(C.getName)),
+	create:   C.cb_create(unsafe.Pointer(C.create)),
+	destroy:  C.cb_destroy(unsafe.Pointer(C.destroy)),
 
-	get_properties: C.cb_get_properties(unsafe.Pointer(C.get_properties_cgo)),
-	get_defaults:   C.cb_get_defaults(unsafe.Pointer(C.get_defaults_cgo)),
-	video_render:   C.cb_video_render(unsafe.Pointer(C.video_render_cgo)),
-	get_width:      C.cb_get_width(unsafe.Pointer(C.get_width_cgo)),
-	get_height:     C.cb_get_height(unsafe.Pointer(C.get_height_cgo)),
-	update:         C.cb_update(unsafe.Pointer(C.update_cgo)),
-	show:           C.cb_show(unsafe.Pointer(C.show_cgo)),
-	hide:           C.cb_hide(unsafe.Pointer(C.hide_cgo)),
+	get_properties: C.cb_get_properties(unsafe.Pointer(C.getProperties)),
+	get_defaults:   C.cb_get_defaults(unsafe.Pointer(C.getDefaults)),
+	video_render:   C.cb_video_render(unsafe.Pointer(C.videoRender)),
+	get_width:      C.cb_get_width(unsafe.Pointer(C.getWidth)),
+	get_height:     C.cb_get_height(unsafe.Pointer(C.getHeight)),
+	update:         C.cb_update(unsafe.Pointer(C.update)),
+	show:           C.cb_show(unsafe.Pointer(C.show)),
+	hide:           C.cb_hide(unsafe.Pointer(C.hide)),
 }
 
 //export getName
