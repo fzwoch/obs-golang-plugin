@@ -5,44 +5,44 @@ package main
 // #include <obs/obs-module.h>
 //
 // typedef const char* (*cb_get_name)(void* type_data);
-// const char* get_name_cgo(void* type_data);
+// extern const char* get_name_cgo(void* type_data);
 //
 // typedef void* (*cb_create)(obs_data_t* settings, obs_source_t* source);
-// void* create_cgo(obs_data_t* settings, obs_source_t* source);
+// extern void* create_cgo(obs_data_t* settings, obs_source_t* source);
 //
 // typedef void (*cb_destroy)(void* data);
-// void destroy_cgo(void* data);
+// extern void destroy_cgo(void* data);
 //
 // typedef obs_properties_t* (*cb_get_properties)(void* data);
-// obs_properties_t* get_properties_cgo(void* data);
+// extern obs_properties_t* get_properties_cgo(void* data);
 //
 // typedef void (*cb_get_defaults)(obs_data_t* settings);
-// void get_defaults_cgo(obs_data_t* settings);
+// extern void get_defaults_cgo(obs_data_t* settings);
 //
 // typedef void (*cb_video_render)(void* data, gs_effect_t* effect);
-// void video_render_cgo(void* data, gs_effect_t* effect);
+// extern void video_render_cgo(void* data, gs_effect_t* effect);
 //
 // typedef uint32_t (*cb_get_width)(void* data);
-// uint32_t get_width_cgo(void* data);
+// extern uint32_t get_width_cgo(void* data);
 //
 // typedef uint32_t (*cb_get_height)(void* data);
-// uint32_t get_height_cgo(void* data);
+// extern uint32_t get_height_cgo(void* data);
 //
 // typedef void (*cb_update)(void* data, obs_data_t* settings);
-// void update_cgo(void* data, obs_data_t* settings);
+// extern void update_cgo(void* data, obs_data_t* settings);
 //
 // typedef void (*cb_show)(void* data);
-// void show_cgo(void* data);
+// extern void show_cgo(void* data);
 //
 // typedef void (*cb_hide)(void* data);
-// void hide_cgo(void* data);
+// extern void hide_cgo(void* data);
 import "C"
 import (
 	"sync"
 	"unsafe"
 )
 
-type ctx struct {}
+type ctx struct{}
 
 var ctxs = struct {
 	sync.RWMutex
