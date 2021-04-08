@@ -68,8 +68,10 @@ func obs_module_ver() C.uint32_t {
 	return C.LIBOBS_API_VER
 }
 
+var obs_plugin_id *C.char = C.CString("obs-golang-plugin")
+
 var source = C.struct_obs_source_info{
-	id:           C.CString("obs-golang-plugin"),
+	id:           obs_plugin_id,
 	_type:        C.OBS_SOURCE_TYPE_INPUT,
 	output_flags: C.OBS_SOURCE_ASYNC_VIDEO | C.OBS_SOURCE_AUDIO | C.OBS_SOURCE_DO_NOT_DUPLICATE,
 
@@ -87,9 +89,11 @@ var source = C.struct_obs_source_info{
 	hide:           C.hide_t(unsafe.Pointer(C.hide)),
 }
 
+var obs_plugin_name *C.char = C.CString("OBS Golang Plugin")
+
 //export get_name
 func get_name(typeData unsafe.Pointer) *C.char {
-	return C.CString("OBS Golang Plugin")
+	return obs_plugin_name
 }
 
 //export create
