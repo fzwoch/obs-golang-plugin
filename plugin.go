@@ -103,6 +103,8 @@ func get_name(typeData unsafe.Pointer) *C.char {
 func create(settings *C.obs_data_t, source *C.obs_source_t) unsafe.Pointer {
 	var idx uintptr
 
+	ctxs.Lock()
+
 	for {
 		if _, ok := ctxs.c[idx]; !ok {
 			break
@@ -110,11 +112,11 @@ func create(settings *C.obs_data_t, source *C.obs_source_t) unsafe.Pointer {
 		idx++
 	}
 
-	ctxs.Lock()
 	ctxs.c[idx] = &ctx{
 		source:   source,
 		settings: settings,
 	}
+
 	ctxs.Unlock()
 
 	return unsafe.Pointer(idx)
