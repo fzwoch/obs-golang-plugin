@@ -46,9 +46,9 @@ type ctx struct{}
 
 var ctxs = struct {
 	sync.RWMutex
-	c map[unsafe.Pointer]*ctx
+	c map[uintptr]*ctx
 }{
-	c: make(map[unsafe.Pointer]*ctx),
+	c: make(map[uintptr]*ctx),
 }
 
 var obsModulePointer *C.obs_module_t
@@ -98,25 +98,27 @@ func get_name(typeData unsafe.Pointer) *C.char {
 
 //export create
 func create(settings *C.obs_data_t, source *C.obs_source_t) unsafe.Pointer {
-	data := C.malloc(0)
-	if data == nil {
-		panic("nope!")
+	var idx uintptr
+
+	for {
+		if _, ok := ctxs.c[idx]; !ok {
+			break
+		}
+		idx++
 	}
 
 	ctxs.Lock()
-	ctxs.c[data] = &ctx{}
+	ctxs.c[idx] = &ctx{}
 	ctxs.Unlock()
 
-	return data
+	return unsafe.Pointer(idx)
 }
 
 //export destroy
 func destroy(data unsafe.Pointer) {
 	ctxs.Lock()
-	delete(ctxs.c, data)
+	delete(ctxs.c, uintptr(data))
 	ctxs.Unlock()
-
-	C.free(data)
 }
 
 //export get_properties
