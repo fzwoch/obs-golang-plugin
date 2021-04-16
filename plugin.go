@@ -42,7 +42,10 @@ import (
 	"unsafe"
 )
 
-type ctx struct{}
+type ctx struct {
+	source   *C.obs_source_t
+	settings *C.obs_data_t
+}
 
 var ctxs = struct {
 	sync.RWMutex
@@ -108,7 +111,10 @@ func create(settings *C.obs_data_t, source *C.obs_source_t) unsafe.Pointer {
 	}
 
 	ctxs.Lock()
-	ctxs.c[idx] = &ctx{}
+	ctxs.c[idx] = &ctx{
+		source:   source,
+		settings: settings,
+	}
 	ctxs.Unlock()
 
 	return unsafe.Pointer(idx)
