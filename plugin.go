@@ -119,6 +119,9 @@ func create(settings *C.obs_data_t, source *C.obs_source_t) unsafe.Pointer {
 
 	ctxs.Unlock()
 
+	// Note: go vet will complain here.
+	// It is essentially an invalid pointer.
+	// We will just use it as map index internally, so it should be fine.
 	return unsafe.Pointer(idx)
 }
 
@@ -142,7 +145,12 @@ func get_defaults(settings *C.obs_data_t) {
 
 //export video_render
 func video_render(data unsafe.Pointer, effect *C.gs_effect_t) {
+	ctxs.RLock()
+	ctx := ctxs.c[uintptr(data)]
+	ctxs.RUnlock()
 
+	// Do something with your ctx
+	_ = ctx
 }
 
 //export get_width
