@@ -106,10 +106,10 @@ func create(settings *C.obs_data_t, source *C.obs_source_t) unsafe.Pointer {
 	ctxs.Lock()
 
 	for {
+		idx++
 		if _, ok := ctxs.c[idx]; !ok {
 			break
 		}
-		idx++
 	}
 
 	ctxs.c[idx] = &ctx{
