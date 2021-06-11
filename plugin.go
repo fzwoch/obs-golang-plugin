@@ -4,54 +4,47 @@ package main
 //
 // #include <obs/obs-module.h>
 //
-// typedef char* (*get_name_t)(void* type_data);
-// extern char* get_name(void* type_data);
+// typedef char* (*get_name_t)(uintptr_t type_data);
+// extern char* get_name(uintptr_t type_data);
 //
-// typedef void* (*create_t)(obs_data_t* settings, obs_source_t* source);
-// extern void* create(obs_data_t* settings, obs_source_t* source);
+// typedef uintptr_t (*create_t)(obs_data_t* settings, obs_source_t* source);
+// extern uintptr_t create(obs_data_t* settings, obs_source_t* source);
 //
-// typedef void (*destroy_t)(void* data);
-// extern void destroy(void* data);
+// typedef void (*destroy_t)(uintptr_t data);
+// extern void destroy(uintptr_t data);
 //
-// typedef obs_properties_t* (*get_properties_t)(void* data);
-// extern obs_properties_t* get_properties(void* data);
+// typedef obs_properties_t* (*get_properties_t)(uintptr_t data);
+// extern obs_properties_t* get_properties(uintptr_t data);
 //
 // typedef void (*get_defaults_t)(obs_data_t* settings);
 // extern void get_defaults(obs_data_t* settings);
 //
-// typedef void (*video_render_t)(void* data, gs_effect_t* effect);
-// extern void video_render(void* data, gs_effect_t* effect);
+// typedef void (*video_render_t)(uintptr_t data, gs_effect_t* effect);
+// extern void video_render(uintptr_t data, gs_effect_t* effect);
 //
-// typedef uint32_t (*get_width_t)(void* data);
-// extern uint32_t get_width(void* data);
+// typedef uint32_t (*get_width_t)(uintptr_t data);
+// extern uint32_t get_width(uintptr_t data);
 //
-// typedef uint32_t (*get_height_t)(void* data);
-// extern uint32_t get_height(void* data);
+// typedef uint32_t (*get_height_t)(uintptr_t data);
+// extern uint32_t get_height(uintptr_t data);
 //
-// typedef void (*update_t)(void* data, obs_data_t* settings);
-// extern void update(void* data, obs_data_t* settings);
+// typedef void (*update_t)(uintptr_t data, obs_data_t* settings);
+// extern void update(uintptr_t data, obs_data_t* settings);
 //
-// typedef void (*show_t)(void* data);
-// extern void show(void* data);
+// typedef void (*show_t)(uintptr_t data);
+// extern void show(uintptr_t data);
 //
-// typedef void (*hide_t)(void* data);
-// extern void hide(void* data);
+// typedef void (*hide_t)(uintptr_t data);
+// extern void hide(uintptr_t data);
 import "C"
 import (
-	"sync"
+	"runtime/cgo"
 	"unsafe"
 )
 
 type ctx struct {
 	source   *C.obs_source_t
 	settings *C.obs_data_t
-}
-
-var ctxs = struct {
-	sync.RWMutex
-	c map[uintptr]*ctx
-}{
-	c: make(map[uintptr]*ctx),
 }
 
 var obsModulePointer *C.obs_module_t
@@ -95,45 +88,27 @@ var source = C.struct_obs_source_info{
 var obs_plugin_name *C.char = C.CString("OBS Golang Plugin")
 
 //export get_name
-func get_name(typeData unsafe.Pointer) *C.char {
+func get_name(typeData C.uintptr_t) *C.char {
 	return obs_plugin_name
 }
 
 //export create
-func create(settings *C.obs_data_t, source *C.obs_source_t) unsafe.Pointer {
-	var idx uintptr
-
-	ctxs.Lock()
-
-	for {
-		idx++
-		if _, ok := ctxs.c[idx]; !ok {
-			break
-		}
-	}
-
-	ctxs.c[idx] = &ctx{
+func create(settings *C.obs_data_t, source *C.obs_source_t) C.uintptr_t {
+	ctx := ctx{
 		source:   source,
 		settings: settings,
 	}
 
-	ctxs.Unlock()
-
-	// Note: go vet will complain here.
-	// It is essentially an invalid pointer.
-	// We will just use it as map index internally, so it should be fine.
-	return unsafe.Pointer(idx)
+	return C.uintptr_t(cgo.NewHandle(ctx))
 }
 
 //export destroy
-func destroy(data unsafe.Pointer) {
-	ctxs.Lock()
-	delete(ctxs.c, uintptr(data))
-	ctxs.Unlock()
+func destroy(data C.uintptr_t) {
+	cgo.Handle(data).Delete()
 }
 
 //export get_properties
-func get_properties(data unsafe.Pointer) *C.obs_properties_t {
+func get_properties(data C.uintptr_t) *C.obs_properties_t {
 	properties := C.obs_properties_create()
 	return properties
 }
@@ -144,37 +119,35 @@ func get_defaults(settings *C.obs_data_t) {
 }
 
 //export video_render
-func video_render(data unsafe.Pointer, effect *C.gs_effect_t) {
-	ctxs.RLock()
-	ctx := ctxs.c[uintptr(data)]
-	ctxs.RUnlock()
+func video_render(data C.uintptr_t, effect *C.gs_effect_t) {
+	ctx := cgo.Handle(data).Value().(ctx)
 
-	// Do something with your ctx
+	// do something with ctx
 	_ = ctx
 }
 
 //export get_width
-func get_width(data unsafe.Pointer) C.uint32_t {
+func get_width(data C.uintptr_t) C.uint32_t {
 	return 0
 }
 
 //export get_height
-func get_height(data unsafe.Pointer) C.uint32_t {
+func get_height(data C.uintptr_t) C.uint32_t {
 	return 0
 }
 
 //export update
-func update(data unsafe.Pointer, settings *C.obs_data_t) {
+func update(data C.uintptr_t, settings *C.obs_data_t) {
 
 }
 
 //export show
-func show(data unsafe.Pointer) {
+func show(data C.uintptr_t) {
 
 }
 
 //export hide
-func hide(data unsafe.Pointer) {
+func hide(data C.uintptr_t) {
 
 }
 
